@@ -1,0 +1,22 @@
+apiVersion: governance.re8ch.com/v1alpha1
+kind: ProjectBinding
+metadata:
+  name: motor-muscle-sim
+spec:
+  parent:
+    catalog: motor-muscle-sim
+    repository: git@gitlab.com:reachievellc/service-backend.git
+    catalogPath: catalogs/motor-muscle-sim/modules/motor-muscle-sim
+    submodulePath: catalogs/motor-muscle-sim/modules/motor-muscle-sim/source
+  identity:
+    maintainerAddress: motor-muscle-sim-maintain@phonaid.com
+    accountClass: project-maintainer
+    googleWorkspacePolicy: eligible
+  workspace:
+    name: motor-muscle-sim-maintain
+    oneActivePerAccount: true
+    branchPrefix: workspace/motor-muscle-sim-maintain/
+  contract:
+    transport: branch-pull-request
+    completion: pull-request-closed
+    evidenceAuthority: kubernetes
