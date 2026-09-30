@@ -23,10 +23,17 @@ class DenseMotorArray:
         dof_indices: np.ndarray,
         seed: int,
         variation: float = 0.08,
+        dof_names: list[str] | None = None,
     ) -> None:
         self.count = motor_count
         self.dof_indices = np.asarray(dof_indices, dtype=np.int32)
         self.group_count = len(self.dof_indices) * 2
+        if dof_names is not None and len(dof_names) != len(self.dof_indices):
+            raise ValueError("dof_names must match dof_indices")
+        self.left_dofs = np.array(
+            [index for index, name in enumerate(dof_names or []) if name.startswith("left_")],
+            dtype=np.int32,
+        )
         rng = np.random.default_rng(seed)
         # Motors are stored contiguously by antagonist group. Their independent
         # parameter draws are unchanged, while the layout enables accelerator
@@ -65,9 +72,11 @@ class DenseMotorArray:
         failed_count = int(round(self.count * failure_ratio))
         if failed_count:
             if concentrated:
-                left_groups = np.arange(self.group_count // 2, dtype=np.int32)
-                candidates = np.flatnonzero(np.isin(self.group, left_groups))
-                failed_count = min(failed_count, len(candidates))
+                if not len(self.left_dofs):
+                    raise ValueError("concentrated failure requires left-side DOF names")
+                candidates = np.flatnonzero(np.isin(self.group_dof, self.left_dofs))
+                if failed_count > len(candidates):
+                    raise ValueError("failure ratio exceeds left-side motor capacity")
                 failed = rng.choice(candidates, failed_count, replace=False)
             else:
                 failed = rng.choice(self.count, failed_count, replace=False)

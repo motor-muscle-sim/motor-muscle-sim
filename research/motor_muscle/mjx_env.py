@@ -227,6 +227,7 @@ class MJXMotorMuscleEnv:
                 self.dof_indices,
                 int(seed),
                 self.config.parameter_variation,
+                self.dof_names,
             )
             motors.reset(
                 int(seed) + 101,
