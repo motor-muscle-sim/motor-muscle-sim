@@ -28,3 +28,21 @@ def test_hot_motors_are_derated():
     motors.step(np.ones(8), np.zeros(8), np.zeros(4), 0.001)
     assert np.all(motors.current[:100] == 0)
 
+
+def test_concentrated_failure_targets_only_left_joints_and_preserves_ratio():
+    names = ["spine", "left_hip", "right_hip", "left_knee", "right_knee"]
+    motors = DenseMotorArray(1_000, np.arange(len(names)), 3, dof_names=names)
+    motors.reset(9, 0.2, concentrated=True)
+    assert np.count_nonzero(motors.failed) == 200
+    assert set(motors.group_dof[motors.failed]) == {1, 3}
+    assert not np.any(motors.failed[np.isin(motors.group_dof, [0, 2, 4])])
+
+
+def test_concentrated_failure_requires_anatomical_names():
+    motors = DenseMotorArray(1_000, np.arange(4), 3)
+    try:
+        motors.reset(9, 0.1, concentrated=True)
+    except ValueError as error:
+        assert "left-side DOF" in str(error)
+    else:
+        raise AssertionError("concentrated failure accepted unnamed joints")

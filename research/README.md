@@ -37,6 +37,10 @@ Run the full experiment only when ready for a long batch:
 
 Outputs are written to `artifacts/` and `results/` and are intentionally ignored
 by Git. The complete evaluation is 3 controllers × 11 scenarios × 100 seeds.
+The `left_failure` scenario disables 10% of all motors, sampling only from
+motors attached to joints named `left_*`. Both antagonist groups of each left
+joint are eligible; axial and right-side joints remain healthy. The CPU and
+MJX backends use the same seeded assignment.
 
 ## ROCm / MJX remote backend
 

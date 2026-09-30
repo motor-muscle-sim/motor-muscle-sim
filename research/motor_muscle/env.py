@@ -46,6 +46,7 @@ class MotorMuscleEnv:
             self.dof_indices,
             self.config.seed,
             self.config.parameter_variation,
+            self.dof_names,
         )
         self.pelvis_body = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
         self.left_foot_geom = mujoco.mj_name2id(
